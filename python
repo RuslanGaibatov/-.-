@@ -1,0 +1,57 @@
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
+from kivy.uix.image import Image
+import random
+
+class GuessNumberGame(App):
+    def build(self):
+        self.secret_number = random.randint(1, 100)
+        self.attempts = 0
+
+        self.layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
+
+        # Используйте изображение согласно плотности пикселей устройства
+        background_img = Image(source='res/drawable/background.png')
+        self.layout.add_widget(background_img)
+
+        self.instructions = Label(text="Угадай число от 1 до 100", font_size=20)
+        self.layout.add_widget(self.instructions)
+
+        self.input_label = Label(text="Введите вашу догадку:", font_size=16)
+        self.layout.add_widget(self.input_label)
+
+        self.user_input = TextInput(multiline=False, font_size=16)
+        self.layout.add_widget(self.user_input)
+
+        self.attempts_label = Label(text=f"Попыток: {self.attempts}", font_size=16)
+        self.layout.add_widget(self.attempts_label)
+
+        self.submit_button = Button(text="Отправить", font_size=16, on_press=self.check_guess)
+        self.layout.add_widget(self.submit_button)
+
+        return self.layout
+
+    def check_guess(self, instance):
+        try:
+            guess = int(self.user_input.text)
+            self.attempts += 1
+
+            if guess == self.secret_number:
+                self.instructions.text = f"Поздравляем! Вы угадали число за {self.attempts} попыток."
+            elif guess < self.secret_number:
+                self.instructions.text = "Слишком маленькое. Попробуйте еще раз."
+            else:
+                self.instructions.text = "Слишком большое. Попробуйте еще раз."
+
+            self.attempts_label.text = f"Попыток: {self.attempts}"
+
+        except ValueError:
+            self.instructions.text = "Неверный ввод. Пожалуйста, введите число."
+
+        self.user_input.text = "" 
+
+if __name__ == '__main__':
+    GuessNumberGame().run()
